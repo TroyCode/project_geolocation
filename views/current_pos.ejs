@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Get your position</title>
+    <style>
+      #map {
+        height: 100%;
+      }
+      html,body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  </head>
+  <body>
+    <!-- <button id="show">Show my location</button> -->
+    <div id="map"></div>
+    <script>
+      var pos;
+      var map;
+      var x1=25.0447,y1=121.535,x2=25.0447,y2=121.565
+      var id=1,id2=2
+      var markers=[]
+      var markers2=[]
+      function initMap() {
+        map = new google.maps.Map(document.getElementById('map'), {
+          center: { lat: 25.0447, lng: 121.55 },
+          zoom: 15
+        });
+
+  var image = 'https://maps.google.com/mapfiles/ms/icons/blue-dot.png'
+        var des= new google.maps.Marker({
+          position:{lat:25.0447,lng:121.55},
+          map:map,
+          icon:image
+        })
+        // navigator.geolocation.getCurrentPosition(function (position) {
+        //   pos = {
+        //     lat: position.coords.latitude,
+        //     lng: position.coords.longitude
+        //   };
+        //   var marker = new google.maps.Marker({
+        //     position: pos,
+        //     map: map
+        //   })
+        //   map.setCenter(pos);
+        // })
+      }
+      function getUserPos(){
+        for (var i = 0; i < markers.length; i++) {
+          markers[i].setMap(null);
+        }
+          y1+=0.0005;
+          var marker = new google.maps.Marker({
+            position: {lat: x1,lng: y1},
+            map: map
+          })
+          markers.push(marker)
+          $.post("/send",{ID:id,lat: x1,lng:y1},  function(data, status){
+        })
+
+        for (var i = 0; i < markers2.length; i++) {
+          markers2[i].setMap(null);
+        }
+          y2-=0.0005;
+          var marker2 = new google.maps.Marker({
+            position: {lat: x2,lng: y2},
+            map: map
+          })
+          markers2.push(marker2)
+          $.post("/send",{ID:id2,lat: x2,lng:y2},  function(data, status){
+        })
+      }
+      setInterval(getUserPos,1000);
+      // $("#show").click(function(){
+      //   $.post("/senddata",{lat: pos.lat, lng: pos.lng} , function(data, status){
+      //   });
+      // });
+    </script>
+
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBtLdMhgwM1UN5bRNt7OT1y5rvUQmhpbPM&callback=initMap"></script>
+  </body>
+</html>

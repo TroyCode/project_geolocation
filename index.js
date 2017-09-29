@@ -36,21 +36,29 @@ app.post("/send",function(req,res,next){
   var tmp = req.body;
   var temp = fs.readFileSync("./data.json");
   var json = JSON.parse(temp);
-  json.position.push({
-    ID: tmp.ID,
-    lat: tmp.lat,
-    lng: tmp.lng
-  });
+  json[tmp.ID] = {lat: tmp.lat, lng: tmp.lng};
+  // if(json.hasOwnProperty(tmp.ID)){
+  //   console.log(json);
+  //   json[ID].lat = tmp.lat;
+  //   json.ID.lng = tmp.lng;
+  // }
+  // else{
+  //   json[tmp.ID] = [{lat: tmp.lat, lng: tmp.lng}];
+  // }
+  // json.position.push({
+  //   ID: tmp.ID,
+  //   lat: tmp.lat,
+  //   lng: tmp.lng
+  // });
   var obj = JSON.stringify(json);
-  console.log(obj);
   fs.writeFileSync("./data.json",obj);
-  res.send();
+  console.log(json);
+  res.end();
 })
 
 app.get("/getdata",function(req,res,next){
   var temp = fs.readFileSync("./data.json");
   var json = JSON.parse(temp);
-  console.log(json);
   res.send(json);
   // res.render("all",json)
   // res.send("<div> lat: " + json.position[0].lat +"</div>" + "<div> lng: " + json.position[0].lng + "</div>");
@@ -59,6 +67,24 @@ app.get("/getdata",function(req,res,next){
 app.get("/test",function(req,res,next){
   res.render("marker");
 })
+
+app.get("/current",function(req,res,next){
+  res.render("current_pos");
+})
+
+// app.post("/senddata",function(req,res,next){
+//   var tmp = req.body;
+//   var temp = fs.readFileSync("./data.json");
+//   var json = JSON.parse(temp);
+//   json.position.push({
+//     lat: tmp.lat,
+//     lng: tmp.lng
+//   });
+//   var obj = JSON.stringify(json);
+//   fs.writeFile("./data.json",obj,function(){
+//     res.end();
+//   });
+// })
 
 app.listen(8080,function(){
   console.log("server on port 8080");
