@@ -1,7 +1,7 @@
 var express = require('express');
 var https = require("https");
 var bodyParser = require("body-parser");
-var request = require("request");
+// var request = require("request");
 var fs = require("fs");
 
 var app = express();
@@ -12,21 +12,21 @@ app.set("view engine","ejs");
 app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.get("/geolocation",function(req,res,next){
-  var tmp = "";
-  const options = {
-    url: "https://www.googleapis.com/geolocation/v1/geolocate?key=AIzaSyBtLdMhgwM1UN5bRNt7OT1y5rvUQmhpbPM",
-    method: 'POST',
-    headers: {'content-type':'application/json'},
-    body: pos,
-    json: true
-  };
-  request(options,function(err,response,body){
-    tmp = body.location;
-    // res.send(body.location);
-    res.render("cellid",tmp)
-  })
-})
+// app.get("/geolocation",function(req,res,next){
+//   var tmp = "";
+//   const options = {
+//     url: "https://www.googleapis.com/geolocation/v1/geolocate?key=AIzaSyBtLdMhgwM1UN5bRNt7OT1y5rvUQmhpbPM",
+//     method: 'POST',
+//     headers: {'content-type':'application/json'},
+//     body: pos,
+//     json: true
+//   };
+//   request(options,function(err,response,body){
+//     tmp = body.location;
+//     // res.send(body.location);
+//     res.render("cellid",tmp)
+//   })
+// })
 
 app.get("/form",function(req,res,next){
   res.render("form");
