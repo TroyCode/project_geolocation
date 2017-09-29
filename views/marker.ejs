@@ -1,0 +1,74 @@
+<html>
+    <head>
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+      <title>All Location</title>
+      <style>
+        #map {
+          height: 100%;
+        }
+        html, body {
+          height: 100%;
+          margin: 0;
+          padding: 0;
+        }
+      </style>
+    </head>
+    <body>
+      <h1>Personal_Info</h1>
+      <form id="info" name="form" method="post" action="/form" onsubmit="return add()">
+        ID
+        <input type="text" name="ID"><br>
+        lat
+        <input type="text" name="lat"><br>
+        lng
+        <input type="text" name="lng"><br>
+        <input type="submit" value="submit">
+      </form>
+      <button onclick="addPoint()">Show Marker</button>
+      <div id="test"></div>
+      <div id="map"></div>
+      <script>
+        var map;
+        function initMap() {
+          map = new google.maps.Map(document.getElementById('map'), {
+            center: {lat: 25, lng: 121.5},
+            zoom: 14
+          });
+        }
+        function addPoint(){
+          $.ajax({
+            url: "/getdata",
+            type: "get",
+            success: function(result){
+              var tmp = {lat: result.position[0].lat,lng: result.position[0].lng};
+              map.setCenter(tmp);
+              for(let i = 0;i < result.position.length;i++){
+                var marker = new google.maps.Marker({
+                  position: {lat: Number(result.position[i].lat),lng: Number(result.position[i].lng)},
+                  map: map
+                })
+              }         
+              console.log("success");
+            }
+          })
+        }
+        function add(){
+          var tmp = document.forms["info"].ID.value;
+          var tmp2 = document.forms["info"].lat.value
+          var tmp3 = document.forms["info"].lng.value
+          $.ajax({
+            url: "/send",
+            type: "post",
+            data: {ID: tmp, lat: tmp2, lng: tmp3},
+            success: function(result){
+              console.log("success");
+            }
+          })
+          return false;
+        }
+      </script>
+      <script async defer
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBtLdMhgwM1UN5bRNt7OT1y5rvUQmhpbPM&callback=initMap">
+      </script>
+    </body>
+  </html>

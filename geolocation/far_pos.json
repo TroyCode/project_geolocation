@@ -1,0 +1,24 @@
+{
+  "homeMobileCountryCode": 466,
+  "homeMobileNetworkCode": 1,
+  "radioType": "lte",
+  "carrier": "far eastone",
+  "considerIp": "false",
+  "cellTowers": [
+    {
+      "cellId": 51575328,
+      "locationAreaCode": 39313,
+      "mobileCountryCode": 466,
+      "mobileNetworkCode": 1,
+      "signalStrength": -95 
+    }
+  ],
+  "wifiAccessPoints": [
+    {
+        "macAddress": "4C:66:41:92:B4:AC"
+    },
+    {
+        "macAddress": "4C:66:41:92:B4:AD"
+    }
+  ]
+}
