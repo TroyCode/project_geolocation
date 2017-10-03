@@ -1,5 +1,5 @@
 var express = require('express');
-var https = require("https");
+// var https = require("https");
 var bodyParser = require("body-parser");
 var request = require("request");
 var fs = require("fs");
@@ -64,27 +64,13 @@ app.get("/getdata",function(req,res,next){
   // res.send("<div> lat: " + json.position[0].lat +"</div>" + "<div> lng: " + json.position[0].lng + "</div>");
 })
 
-app.get("/test",function(req,res,next){
+app.get("/marker",function(req,res,next){
   res.render("marker");
 })
 
 app.get("/current",function(req,res,next){
   res.render("current_pos");
 })
-
-// app.post("/senddata",function(req,res,next){
-//   var tmp = req.body;
-//   var temp = fs.readFileSync("./data.json");
-//   var json = JSON.parse(temp);
-//   json.position.push({
-//     lat: tmp.lat,
-//     lng: tmp.lng
-//   });
-//   var obj = JSON.stringify(json);
-//   fs.writeFile("./data.json",obj,function(){
-//     res.end();
-//   });
-// })
 
 app.listen(8080,function(){
   console.log("server on port 8080");
