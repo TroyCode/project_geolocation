@@ -7,16 +7,18 @@ var mongo = require("mongodb");
 // var GoogleStrategy = require( 'passport-google-oauth2' ).Strategy;
 // var passport = require("passport")
 
-var privateKey = fs.readFileSync('./private.pem', 'utf8');
-var certificate = fs.readFileSync('./file.crt', 'utf8');
-var credentials = {key: privateKey, cert: certificate};
+// var privateKey = fs.readFileSync('./private.pem', 'utf8');
+// var certificate = fs.readFileSync('./file.crt', 'utf8');
+// var credentials = {key: privateKey, cert: certificate};
 
 var app = express();
 var MongoClient = require('mongodb').MongoClient;
-var httpsServer = https.createServer(credentials,app);
+// var httpsServer = https.createServer(credentials,app);
 var pos = require("./geolocation/far_pos.json");
 var all_pos = require("./data.json");
-var url = "mongodb://localhost:27017/position";
+// var url = "mongodb://localhost:27017/position";
+var url = "mongodb://10.102.250.102:27017/position";
+
 
 app.set("view engine","ejs");
 app.use(express.static('public'));
@@ -114,9 +116,89 @@ app.get("/getdata",function(req,res,next){
 app.get("/marker",function(req,res,next){
   res.render("marker");
 })
+app.get("/calendar",function(req,res,next){
+  res.render("calendar");
+})
 
-app.get("/current",function(req,res,next){
-  res.render("current_pos");
+app.post("/current",function(req,res,next){
+  var tmp = JSON.parse(req.body.data)
+  console.log(tmp);
+
+
+
+  var myobj = {
+    "event_id":tmp.id,
+    "attendees":tmp.attendees,
+    "destination":tmp.location,
+    "time":{"start":tmp.start.dateTime,"end":tmp.end.dateTime},
+    "summary":tmp.summary};
+    var myobj_p = {
+      "event_id":tmp.id};
+    // console.log(tmp.attendees)
+    for(let key in tmp.attendees){
+      var person = tmp.attendees[key].email;
+      var obj = {};
+      obj[person] = {location:{lat:0,lng:0}};
+      myobj_p = Object.assign(myobj_p, obj)
+    }
+    console.log(myobj_p)
+
+  // var myquery = {"name":tmp.ID};
+  // var newvalues = {$set:{"position":{"lat":tmp.lat,"lng":tmp.lng}}};
+
+  // var temp = fs.readFileSync("./data.json");
+  // var json = JSON.parse(temp);
+  // json[tmp.ID] = {lat: tmp.lat, lng: tmp.lng};
+  // console.log(json);
+  
+
+
+
+  // MongoClient.connect(url, function(err, db) {
+  //   if (err) throw err;
+  //   db.collection("events").findOne({"event_id": tmp.id}, function(err, result) {
+  //     if (err) throw err;
+  //     if(!result){
+  //       db.collection("events").insertOne(myobj, function(err, res) {
+  //         if (err) throw err;
+  //         console.log("1 document inserted");
+  //       });
+  //     }
+  //     // else{
+  //     //   db.collection("events").updateOne(myquery, newvalues, function(err, res) {
+  //     //     if (err) throw err;
+  //     //     console.log("1 document updated");
+  //     //   });
+  //     // }
+  //   });
+
+  //   db.collection("position").findOne({"event_id": tmp.id}, function(err, result) {
+  //     if (err) throw err;
+  //     if(!result){
+  //       db.collection("events").insertOne(myobj, function(err, res) {
+  //         if (err) throw err;
+  //         console.log("1 document inserted");
+  //       });
+  //     }
+  //   });
+  //   db.close();    
+  // });
+
+
+
+
+  // const options = {
+  //   url: "https://maps.googleapis.com/maps/api/geocode/json?address="+ tmp.location +"&key=AIzaSyBUVMPkDskVQlUsdw92-Ygv9qhIB0UOQH4",
+  //   method: 'POST',
+  //   headers: {'content-type':'application/json'},
+  //   body: '',
+  //   json: true
+  // };
+  // request(options,function(err,response,body){
+  //   var tmp2 = body.results[0].geometry.location;
+  //   // res.render("current_pos",tmp2);
+  // })
+  res.end();
 })
 
 // httpsServer.listen(8081,function(){
