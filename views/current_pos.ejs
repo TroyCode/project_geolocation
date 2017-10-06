@@ -17,6 +17,8 @@
   <body>
     <!-- <button id="show">Show my location</button> -->
     <div id="map"></div>
+    <p><%= lat %></p>
+    <p><%= lng %></p>
     <script>
       var pos;
       var map;
@@ -31,10 +33,16 @@
           zoom: 18
         });
         var image = 'https://maps.google.com/mapfiles/ms/icons/blue-dot.png'
+        var image2 = 'https://maps.google.com/mapfiles/ms/icons/green-dot.png'
         var des= new google.maps.Marker({
           position:{lat:24.978265,lng:121.550483},
           map:map,
           icon:image
+        })
+        var destination = new google.maps.Marker({
+          position: {lat: <%= lat %>,lng: <%= lng %>},
+          map: map,
+          icon:image2
         })
         // navigator.geolocation.getCurrentPosition(function (position) {
         //   pos = {
