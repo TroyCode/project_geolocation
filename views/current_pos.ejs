@@ -48,33 +48,39 @@
         //   map.setCenter(pos);
         // })
       }
-      function getUserPos(){
+      function getUser1Pos(){
         x1 -= 0.0001;
         y1 -= 0.00016;
-        x2 += 0.0001;
-        y2 += 0.00016;
+
         for (var i = 0; i < markers1.length; i++) {
           markers1[i].setMap(null);
         }
         // markers1 = [];
-        for (var i = 0; i < markers2.length; i++) {
-          markers2[i].setMap(null);
-        }
-        var marker = new google.maps.Marker({
+
+        var marker1 = new google.maps.Marker({
           position: {lat: x1,lng: y1},
           map: map
         })
-        markers1.push(marker)
+        markers1.push(marker1)
+        $.post("/send", {ID:id1,lat: x1,lng:y1}, function(data, status){
+          console.log("user1 success");
+        })
+
+      }
+      function getUser2Pos(){
+        x2 += 0.0001;
+        y2 += 0.00016;
+        for (var i = 0; i < markers2.length; i++) {
+          markers2[i].setMap(null);
+        }
         var marker2 = new google.maps.Marker({
           position: {lat: x2,lng: y2},
           map: map
         })
         markers2.push(marker2)
-        $.post("/send", {ID:id1,lat: x1,lng:y1}, function(data, status){
-          console.log("success");
-        })
+
         $.post("/send",{ID:id2,lat: x2,lng:y2},  function(data, status){
-          console.log("success");
+          console.log("user2 success");
         })
       }
       function getCurPos(){
@@ -93,12 +99,13 @@
           markers.push(marker);
           // map.setCenter(pos);
           $.post("/send",{ID:id,lat: pos.lat,lng:pos.lng},  function(data, status){
-            console.log("success");
+            console.log("current success");
           })
         })
       }
       setInterval(getCurPos,5000);
-      setInterval(getUserPos,5000);
+      setInterval(getUser1Pos,4000);
+      setInterval(getUser2Pos,3000);
       // $("#show").click(function(){
       //   $.post("/senddata",{lat: pos.lat, lng: pos.lng} , function(data, status){
       //   });
