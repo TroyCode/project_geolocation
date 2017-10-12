@@ -16,6 +16,7 @@ var MongoClient = require('mongodb').MongoClient;
 // var httpsServer = https.createServer(credentials,app);
 var pos = require("./geolocation/far_pos.json");
 var all_pos = require("./data.json");
+
 var url = "mongodb://localhost:27017/users";
 // var url = "mongodb://10.102.250.102:27017/position";
 

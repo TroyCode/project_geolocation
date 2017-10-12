@@ -37,6 +37,7 @@
       <input type="submit" value="Submit">
     </form>
 
+
     <script type="text/javascript">
 
       // Client ID and API key from the Developer Console
@@ -58,6 +59,7 @@
       function handleClientLoad() {
         gapi.load('client:auth2', initClient);
       }
+
       /**
        *  Initializes the API client library and sets up sign-in state
        *  listeners.
@@ -84,12 +86,10 @@
        */
       function updateSigninStatus(isSignedIn) {
         if (isSignedIn) {
-          console.log("In")
           authorizeButton.style.display = 'none';
           signoutButton.style.display = 'block';
           listUpcomingEvents();
         } else {
-          console.log("Out")          
           authorizeButton.style.display = 'block';
           signoutButton.style.display = 'none';
         }
@@ -169,10 +169,11 @@
           } else {
             appendPre('No upcoming events found.');
           }
+
           // console.log(response)
           // console.log(temp)
           // console.log(JSON.stringify(temp))
-
+          
           // mydata = {
           // "data" : temp
           // }
@@ -187,6 +188,6 @@
       onload="this.onload=function(){};handleClientLoad()"
       onreadystatechange="if (this.readyState === 'complete') this.onload()">
     </script>
-<script src="https://apis.google.com/js/platform.js?onload=renderButton" async defer></script>
+    <script src="https://apis.google.com/js/platform.js?onload=renderButton" async defer></script>
   </body>
 </html>
