@@ -17,24 +17,32 @@
   <body>
     <!-- <button id="show">Show my location</button> -->
     <div id="map"></div>
+    <p><%= lat %></p>
+    <p><%= lng %></p>
     <script>
       var pos;
       var map;
-      var x1=25.0447,y1=121.535,x2=25.0447,y2=121.565
-      var id=1,id2=2
-      var markers=[]
-      var markers2=[]
+      var x1 = 24.9793,y1 = 121.55232,x2 = 24.977,y2 = 121.54865;
+      var id1 = 1,id2 = 2,id = "cur";
+      var markers1 = [];
+      var markers2 = [];
+      var markers = [];
       function initMap() {
         map = new google.maps.Map(document.getElementById('map'), {
-          center: { lat: 25.0447, lng: 121.55 },
-          zoom: 15
+          center: { lat: 24.978265, lng: 121.550483 },
+          zoom: 18
         });
-
-  var image = 'https://maps.google.com/mapfiles/ms/icons/blue-dot.png'
+        var image = 'https://maps.google.com/mapfiles/ms/icons/blue-dot.png'
+        var image2 = 'https://maps.google.com/mapfiles/ms/icons/green-dot.png'
         var des= new google.maps.Marker({
-          position:{lat:25.0447,lng:121.55},
+          position:{lat:24.978265,lng:121.550483},
           map:map,
           icon:image
+        })
+        var destination = new google.maps.Marker({
+          position: {lat: <%= lat %>,lng: <%= lng %>},
+          map: map,
+          icon:image2
         })
         // navigator.geolocation.getCurrentPosition(function (position) {
         //   pos = {
@@ -48,32 +56,64 @@
         //   map.setCenter(pos);
         // })
       }
-      function getUserPos(){
-        for (var i = 0; i < markers.length; i++) {
-          markers[i].setMap(null);
+      function getUser1Pos(){
+        x1 -= 0.0001;
+        y1 -= 0.00016;
+
+        for (var i = 0; i < markers1.length; i++) {
+          markers1[i].setMap(null);
         }
-          y1+=0.0005;
-          var marker = new google.maps.Marker({
-            position: {lat: x1,lng: y1},
-            map: map
-          })
-          markers.push(marker)
-          $.post("/send",{ID:id,lat: x1,lng:y1},  function(data, status){
+        // markers1 = [];
+
+        var marker1 = new google.maps.Marker({
+          position: {lat: x1,lng: y1},
+          map: map
+        })
+        markers1.push(marker1)
+        $.post("/send", {ID:id1,lat: x1,lng:y1}, function(data, status){
+          console.log("user1 success");
         })
 
+      }
+      function getUser2Pos(){
+        x2 += 0.0001;
+        y2 += 0.00016;
         for (var i = 0; i < markers2.length; i++) {
           markers2[i].setMap(null);
         }
-          y2-=0.0005;
-          var marker2 = new google.maps.Marker({
-            position: {lat: x2,lng: y2},
-            map: map
-          })
-          markers2.push(marker2)
-          $.post("/send",{ID:id2,lat: x2,lng:y2},  function(data, status){
+        var marker2 = new google.maps.Marker({
+          position: {lat: x2,lng: y2},
+          map: map
+        })
+        markers2.push(marker2)
+
+        $.post("/send",{ID:id2,lat: x2,lng:y2},  function(data, status){
+          console.log("user2 success");
         })
       }
-      setInterval(getUserPos,1000);
+      function getCurPos(){
+        navigator.geolocation.getCurrentPosition(function (position) {
+          pos = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          };
+          for (var i = 0; i < markers.length; i++) {
+            markers[i].setMap(null);
+          }
+          var marker = new google.maps.Marker({
+            position: pos,
+            map: map
+          })
+          markers.push(marker);
+          // map.setCenter(pos);
+          $.post("/send",{ID:id,lat: pos.lat,lng:pos.lng},  function(data, status){
+            console.log("current success");
+          })
+        })
+      }
+      setInterval(getCurPos,5000);
+      setInterval(getUser1Pos,4000);
+      setInterval(getUser2Pos,3000);
       // $("#show").click(function(){
       //   $.post("/senddata",{lat: pos.lat, lng: pos.lng} , function(data, status){
       //   });
