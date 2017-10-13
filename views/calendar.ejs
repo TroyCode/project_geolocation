@@ -2,8 +2,19 @@
 <html>
   <head>
     <title>Google Calendar API Quickstart</title>
+    <style>
+        #map {
+          height: 100%;
+        }
+        html,body {
+          height: 100%;
+          margin: 0;
+          padding: 0;
+        }
+      </style>
     <meta charset='utf-8' />
     <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <meta name="google-signin-client_id" content="506634394743-lfkonje6ojpeqjpfin97v5umupjon3ed.apps.googleusercontent.com">
   </head>
   <body>
@@ -30,15 +41,24 @@
     </script>
     <!--Add buttons to initiate auth sequence and sign out-->
     <button id="signout-button" style="display: none;">Sign Out</button>
-    <pre id="content"></pre>
+    <!-- <pre id="content"></pre> -->
     </br></br>
     <form id="myForm" action="/current" method="post">
       Calendar datas: <input  id="mydata" type="text" name="data"><br>
       <input type="submit" value="Submit">
     </form>
 
+    <p id="myEvent" ></p>
+    <button onclick="listUpcomingEvents()">ShowEvent</button>
+    <button onclick="showMap()">ShowMap</button>
+    <div id="map"></div>
 
     <script type="text/javascript">
+      var curpos;
+      var map;
+      var markers = [];
+      var myMarker = [];
+      var temp;
 
       // Client ID and API key from the Developer Console
       var CLIENT_ID = '506634394743-lfkonje6ojpeqjpfin97v5umupjon3ed.apps.googleusercontent.com';
@@ -118,9 +138,12 @@
        * @param {string} message Text to be placed in pre element.
        */
       function appendPre(message) {
-        var pre = document.getElementById('content');
-        var textContent = document.createTextNode(message + '\n');
-        pre.appendChild(textContent);
+        // var pre = document.getElementById('myEvent');
+        // var textContent = document.createTextNode(message + '\n');
+        // pre.appendChild(textContent);
+        var temp = document.getElementById("myEvent").innerHTML;
+        // document.getElementById("myEvent").innerHTML = "Upcoming event info:" + "<br/>" + message ;
+        document.getElementById("myEvent").innerHTML = temp + "<br/>" + message ;
       }
 
       /**
@@ -130,9 +153,7 @@
        */
       function listUpcomingEvents() {
 
-        var temp;
         var mydata;
-
         gapi.client.calendar.events.list({
           'calendarId': 'primary',
           'timeMin': (new Date()).toISOString(),
@@ -142,7 +163,6 @@
           'orderBy': 'startTime'
         }).then(function(response) {
           var events = response.result.items;
-          appendPre('Upcoming events:');
 
           if (events.length > 0) {
             for (i = 0; i < events.length; i++) {
@@ -151,8 +171,6 @@
               if (!when) {
                 when = event.start.date;
               }
-              appendPre(event.summary + ' (' + when + ')')
-
               // console.log(event)
               temp =
                 // event.summary
@@ -164,6 +182,17 @@
                 'end'     :event.end,
                 'attendees':event.attendees
                 }
+                // console.log(temp.attendees)
+                appendPre("start time : "+ "( " + when + " )")
+                var temp_attendees ="";
+                for(var key in event.attendees){
+                  temp_attendees += (' '+event.attendees[key].displayName);
+                }
+                appendPre("attendees :" + temp_attendees);
+                appendPre("summary:" + event.summary );
+                appendPre("destination:" + event.location);
+                appendPre("event_id:" + event.id,);
+
               
             }
           } else {
@@ -178,9 +207,117 @@
           // "data" : temp
           // }
           document.getElementById("mydata").value = JSON.stringify(temp);
+          
+          $.ajax({
+            url: "/sendevent",
+            type: "post",
+            data:temp,
+            success: function(result){
+              console.log("1 event insert")
+            }
+          }) 
+
         });
         // console.log(temp)        
       }
+
+      function updatecurpos(){
+        navigator.geolocation.getCurrentPosition(function (position) {
+          
+          curpos = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          };          
+          var obj = {
+            "position" : {
+              lat:curpos.lat,
+              lng:curpos.lng
+            },
+            "event_id":temp.id,
+            "attendees":temp.attendees
+          }
+          console.log(curpos);
+          $.post("/sendposition",obj,function(data, status){
+            console.log("current success");
+          })
+        })
+      }
+      setInterval(updatecurpos,5000)
+      var despos={lat:0,lng:0}
+      function showMap(){
+        $.ajax({
+          url: "/getDestination",
+          type: "post",
+          data:{"location":temp.location},
+          success: function(result){
+            // console.log(result)
+            despos.lat=result.position.lat
+            despos.lng=result.position.lng
+            var script = document.createElement('script');
+            script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyBtLdMhgwM1UN5bRNt7OT1y5rvUQmhpbPM&callback=initMap';
+            var body = document.getElementsByTagName("body")[0];
+            body.appendChild(script);
+          }
+        }) 
+      }
+
+      function initMap() {
+        map = new google.maps.Map(document.getElementById('map'), {
+          // center: { lat: 24.978265, lng: 121.550483 },
+          zoom: 16
+        });
+        var image = 'https://maps.google.com/mapfiles/ms/icons/blue-dot.png'
+        var image2 = 'https://maps.google.com/mapfiles/ms/icons/green-dot.png'
+        
+        var destination = new google.maps.Marker({
+          position: despos,
+          map: map,
+          icon:image2,
+          label:"目的地"   
+        })
+        map.setCenter(despos);
+          for (var i = 0; i < myMarker.length; i++) {
+            myMarker[i].setMap(null);
+          }
+          myMarker = [];
+          var marker = new google.maps.Marker({
+            position: curpos,
+            map: map,
+            icon:image,
+            label:"我"
+          })
+          myMarker.push(marker);
+        addPoint();
+        
+      }
+
+      function addPoint(){
+          $.ajax({
+            url: "/getdata",
+            type: "post",
+            data:{"event_id":temp.id,
+                  "attendees":temp.attendees},
+            success: function(result){
+              var labels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+              var labelIndex = 0;
+
+              for (var i = 0; i < markers.length; i++) {
+                markers[i].setMap(null);
+              }
+              markers = [];
+              for(let i = 0;i < result.length;i++){
+                var marker = new google.maps.Marker({
+                  position: {lat: Number(result[i].position.lat),lng: Number(result[i].position.lng)},
+                  // label: labels[labelIndex++ % labels.length],
+                  label: result[i].displayname,
+                  map: map
+                })
+                markers.push(marker);
+              }        
+              console.log("add marker success");
+            }
+          })
+        }
 
     </script>
 
