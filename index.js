@@ -51,37 +51,75 @@ app.get("/geolocation",function(req,res,next){
 app.get("/form",function(req,res,next){
   res.render("form");
 })
-
-app.post("/send",function(req,res,next){
+app.post("/sendevent",function(req,res,next){
+  var tmp=req.body;
+  console.log(tmp);
+  var myobj = {
+    "event_id":tmp.id,
+    "attendees":tmp.attendees,
+    "destination":tmp.location,
+    "time":{"start":tmp.start.dateTime,"end":tmp.end.dateTime},
+    "summary":tmp.summary};
+  MongoClient.connect(url, function (err, db) {
+    if (err) throw err;
+    db.collection("events").findOne({ "event_id": tmp.id }, function (err, result) {
+      if (err) throw err;
+      if (!result) {
+        db.collection("events").insertOne(myobj, function (err, res) {
+          if (err) throw err;
+          console.log("1 event inserted");
+        });
+      }
+    db.close();
+    });
+  });
+  res.end();
+});
+app.post("/sendposition",function(req,res,next){
   var tmp = req.body;
-  // console.log(tmp)
-  // var myobj = {"name":tmp.ID,"position":{"lat":tmp.lat,"lng":tmp.lng}};
-  var myquery = {"event_id":event_id,"name": name};
-  var newvalues = {$set:{"position":{"lat":tmp.lat,"lng":tmp.lng}}};
+  var temp_me = "";
+  var temp_disname="";
+  for(let key in tmp.attendees){
+    if(tmp.attendees[key].self){
+      temp_me = tmp.attendees[key].email;
+      temp_disname = tmp.attendees[key].displayName;
+      break;
+    }
+  }
 
+  var myquery = {"event_id":tmp.event_id,"name": temp_me};
+  var newvalues = {$set:{"position":tmp.position}};
+
+  var myobj_p = {
+    "event_id":tmp.event_id,      
+    "name"    : temp_me,
+    "displayname":temp_disname,      
+    "position":tmp.position
+  };
   // var temp = fs.readFileSync("./data.json");
   // var json = JSON.parse(temp);
   // json[tmp.ID] = {lat: tmp.lat, lng: tmp.lng};
   // console.log(json);
-  
+  console.log("123");
   MongoClient.connect(url, function(err, db) {
     if (err) throw err;
-    // db.collection("position").findOne({"event_id":tmp.event,"name": tmp.ID}, function(err, result) {
-      // if (err) throw err;
-      // if(!result){
-      //   db.collection("users").insertOne(myobj, function(err, res) {
-      //     if (err) throw err;
-      //     console.log("1 document inserted");
-      //   });
-      // }
-      // else{
+    db.collection("position").findOne({"event_id":tmp.event_id,"name": temp_me}, function(err, result) {
+      if (err) throw err;
+      console.log("I'm here");
+      if(!result){
+        db.collection("position").insertOne(myobj_p, function(err, res) {
+          if (err) throw err;
+          console.log("1 document inserted");
+        });
+      }
+      else{
         db.collection("position").updateOne(myquery, newvalues, function(err, res) {
           if (err) throw err;
           console.log("1 document updated");
           db.close();
         });
-      // }
-    // });
+      }
+    });
   });
 
   // if(json.hasOwnProperty(tmp.ID)){
@@ -104,12 +142,24 @@ app.post("/send",function(req,res,next){
   res.end('123');
 })
 
-app.get("/getdata",function(req,res,next){
+app.post("/getdata",function(req,res,next){
+  var tmp=req.body;
+  // attendees key self exist?  true = temp_me (email)
+  var temp_me = "";
+  for(let key in tmp.attendees){
+    if(tmp.attendees[key].self){
+      temp_me = tmp.attendees[key].email;
+      break;
+    }
+  }
+
   MongoClient.connect(url, function(err, db) {
     if (err) throw err;
-    db.collection("position").find({}).toArray(function(err, result) {
+    db.collection("position").find({"event_id":tmp.event_id,"name":{ $ne:temp_me }}).toArray(function(err, result) {
       if (err) throw err;
+      console.log("mongoDB result")
       console.log(result);
+
       db.close();
       res.send(result);
     });
@@ -142,15 +192,18 @@ app.post("/current",function(req,res,next){
  
         // console.log(tmp.attendees)
     var temp_n = "";
+    var temp_disname="";
     for(let key in tmp.attendees){
       if(tmp.attendees[key].self){
         temp_n = tmp.attendees[key].email;
+        temp_disname = tmp.attendees[key].displayName;
         break;
       }
     }
     var myobj_p = {
       "event_id":tmp.id,      
-      "name"    : temp_n,      
+      "name"    : temp_n,
+      "displayname":temp_disname,      
       "position":{"lat":0,"lng":0}
     };
     // console.log(myobj_p)
@@ -224,6 +277,24 @@ app.post("/current",function(req,res,next){
     res.render("position",tmp2);
   })
   // res.end();
+})
+
+app.post("/getDestination",function(req,res,next){
+  var tmp = req.body;
+  const options = {
+    url: "https://maps.googleapis.com/maps/api/geocode/json?address="+ tmp.location +"&key=AIzaSyBUVMPkDskVQlUsdw92-Ygv9qhIB0UOQH4",
+    method: 'POST',
+    headers: {'content-type':'application/json'},
+    body: '',
+    json: true
+  };
+  request(options,function(err,response,body){
+    var tmp2 = {
+      "position":body.results[0].geometry.location
+    };
+
+    res.send(tmp2);
+  })
 })
 
 // httpsServer.listen(8081,function(){
