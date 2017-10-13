@@ -1,11 +1,9 @@
 var express = require('express');
 var https = require("https");
 var bodyParser = require("body-parser");
-// var request = require("request");
+var request = require("request");
 var fs = require("fs");
 var mongo = require("mongodb");
-// var GoogleStrategy = require( 'passport-google-oauth2' ).Strategy;
-// var passport = require("passport")
 
 // var privateKey = fs.readFileSync('./private.pem', 'utf8');
 // var certificate = fs.readFileSync('./file.crt', 'utf8');
@@ -22,7 +20,6 @@ var url = "mongodb://localhost:27017/users";
 
 var event_id;
 var name;
-
 
 app.set("view engine","ejs");
 app.use(express.static('public'));
@@ -204,9 +201,6 @@ app.post("/current",function(req,res,next){
     });
   });
 
-
-
-
   const options = {
     url: "https://maps.googleapis.com/maps/api/geocode/json?address="+ tmp.location +"&key=AIzaSyBUVMPkDskVQlUsdw92-Ygv9qhIB0UOQH4",
     method: 'POST',
@@ -229,7 +223,6 @@ app.post("/current",function(req,res,next){
 // httpsServer.listen(8081,function(){
 //   console.log("https server on port 8081");
 // })
-
 app.listen(8080,function(){
   console.log("server on port 8080");
 })
