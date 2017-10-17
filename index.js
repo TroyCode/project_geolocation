@@ -18,7 +18,7 @@ var name;
 
 
 app.set("view engine","ejs");
-// app.set("views","./project_geolocation/views");
+app.set("views","./project_geolocation/views");
 app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: true }));
 

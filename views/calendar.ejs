@@ -54,6 +54,7 @@
       var markers = [];
       var myMarker = [];
       var temp;
+      var events = [];
 
       // Client ID and API key from the Developer Console
       var CLIENT_ID = '506634394743-lfkonje6ojpeqjpfin97v5umupjon3ed.apps.googleusercontent.com';
@@ -147,7 +148,6 @@
        * appropriate message is printed.
        */
       function listUpcomingEvents() {
-
         var mydata;
         gapi.client.calendar.events.list({
           'calendarId': 'primary',
@@ -157,7 +157,7 @@
           'maxResults': 1,
           'orderBy': 'startTime'
         }).then(function(response) {
-          var events = response.result.items;
+           events = response.result.items;
 
           if (events.length > 0) {
             for (i = 0; i < events.length; i++) {
@@ -166,9 +166,7 @@
               if (!when) {
                 when = event.start.date;
               }
-              // console.log(event)
               temp =
-                // event.summary
                 {
                 'id'      :event.id,
                 'summary' :event.summary,
@@ -177,45 +175,33 @@
                 'end'     :event.end,
                 'attendees':event.attendees
                 }
-                // console.log(temp.attendees)
-                appendPre("start time : "+ "( " + when + " )")
-                var temp_attendees ="";
-                for(var key in event.attendees){
-                  temp_attendees += (' '+event.attendees[key].displayName);
+              appendPre("start time : "+ "( " + when + " )")
+              var temp_attendees ="";
+              for(var key in event.attendees){
+                temp_attendees += (' '+event.attendees[key].displayName);
+              }
+              appendPre("attendees :" + temp_attendees);
+              appendPre("summary:" + event.summary );
+              appendPre("destination:" + event.location);
+
+              $.ajax({
+                url: "/sendevent",
+                type: "post",
+                data:temp,
+                success: function(result){
+                  console.log("1 event get")
                 }
-                appendPre("attendees :" + temp_attendees);
-                appendPre("summary:" + event.summary );
-                appendPre("destination:" + event.location);
+              }) 
             }
-          } else {
-            appendPre('No upcoming events found.');
-          }
-
-          // console.log(response)
-          // console.log(temp)
-          // console.log(JSON.stringify(temp))
-          
-          // mydata = {
-          // "data" : temp
-          // }
-          
-          $.ajax({
-            url: "/sendevent",
-            type: "post",
-            data:temp,
-            success: function(result){
-              console.log("1 event get")
-            }
-          }) 
-
-        });
-        // console.log(temp)    
+          } 
+          else appendPre('No upcoming events found.');
+        });   
         updatecurpos();
       }
 
       function updatecurpos(){
-        navigator.geolocation.getCurrentPosition(function (position) {
-          
+        if (events.length > 0) {
+          navigator.geolocation.getCurrentPosition(function (position) {
           curpos = {
             lat: position.coords.latitude,
             lng: position.coords.longitude
@@ -229,28 +215,32 @@
             "attendees":temp.attendees
           }
           console.log(curpos);
-          $.post("/sendposition",obj,function(data, status){
-            console.log("current success");
+            $.post("/sendposition",obj,function(data, status){
+              console.log("current success");
+            })
           })
-        })
+        }
       }
       setInterval(updatecurpos,5000)
       var despos={lat:0,lng:0}
       function showMap(){
-        $.ajax({
-          url: "/getDestination",
-          type: "post",
-          data:{"location":temp.location},
-          success: function(result){
-            // console.log(result)
-            despos.lat=result.position.lat
-            despos.lng=result.position.lng
-            var script = document.createElement('script');
-            script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyBtLdMhgwM1UN5bRNt7OT1y5rvUQmhpbPM&callback=initMap';
-            var body = document.getElementsByTagName("body")[0];
-            body.appendChild(script);
-          }
-        }) 
+        if (events.length > 0) {
+          $.ajax({
+            url: "/getDestination",
+            type: "post",
+            data:{"location":temp.location},
+            success: function(result){
+              // console.log(result)
+              despos.lat=result.position.lat
+              despos.lng=result.position.lng
+              var script = document.createElement('script');
+              script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyBtLdMhgwM1UN5bRNt7OT1y5rvUQmhpbPM&callback=initMap';
+              var body = document.getElementsByTagName("body")[0];
+              body.appendChild(script);
+            }
+          })
+        }
+        else appendPre("No friends' location infromation");
       }
 
       function initMap() {
@@ -291,17 +281,13 @@
             data:{"event_id":temp.id,
                   "attendees":temp.attendees},
             success: function(result){
-              var labels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-              var labelIndex = 0;
-
-              for (var i = 0; i < markers.length; i++) {
+              for(var i = 0; i < markers.length; i++) {
                 markers[i].setMap(null);
               }
               markers = [];
               for(let i = 0;i < result.length;i++){
                 var marker = new google.maps.Marker({
                   position: {lat: Number(result[i].position.lat),lng: Number(result[i].position.lng)},
-                  // label: labels[labelIndex++ % labels.length],
                   label: result[i].displayname,
                   map: map
                 })
