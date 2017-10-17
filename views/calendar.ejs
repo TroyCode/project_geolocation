@@ -43,13 +43,8 @@
     <button id="signout-button" style="display: none;">Sign Out</button>
     <!-- <pre id="content"></pre> -->
     </br></br>
-    <form id="myForm" action="/current" method="post">
-      Calendar datas: <input  id="mydata" type="text" name="data"><br>
-      <input type="submit" value="Submit">
-    </form>
 
     <p id="myEvent" ></p>
-    <button onclick="listUpcomingEvents()">ShowEvent</button>
     <button onclick="showMap()">ShowMap</button>
     <div id="map"></div>
 
@@ -191,9 +186,6 @@
                 appendPre("attendees :" + temp_attendees);
                 appendPre("summary:" + event.summary );
                 appendPre("destination:" + event.location);
-                appendPre("event_id:" + event.id,);
-
-              
             }
           } else {
             appendPre('No upcoming events found.');
@@ -206,19 +198,19 @@
           // mydata = {
           // "data" : temp
           // }
-          document.getElementById("mydata").value = JSON.stringify(temp);
           
           $.ajax({
             url: "/sendevent",
             type: "post",
             data:temp,
             success: function(result){
-              console.log("1 event insert")
+              console.log("1 event get")
             }
           }) 
 
         });
-        // console.log(temp)        
+        // console.log(temp)    
+        updatecurpos();
       }
 
       function updatecurpos(){
@@ -233,7 +225,7 @@
               lat:curpos.lat,
               lng:curpos.lng
             },
-            "event_id":temp.id,
+            "id":temp.id,
             "attendees":temp.attendees
           }
           console.log(curpos);
@@ -273,7 +265,8 @@
           position: despos,
           map: map,
           icon:image2,
-          label:"目的地"   
+          label:"目的地",
+          opacity: 0.5
         })
         map.setCenter(despos);
           for (var i = 0; i < myMarker.length; i++) {
