@@ -11,8 +11,6 @@ var mongo = require("mongodb");
 
 var app = express();
 // var httpsServer = https.createServer(credentials,app);
-var pos = require("./geolocation/far_pos.json");
-var all_pos = require("./data.json");
 var router = require("./router.js");
 
 var event_id;
