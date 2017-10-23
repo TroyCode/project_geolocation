@@ -100,12 +100,12 @@ app.post("/sendposition",function(req,res,next){
   // var json = JSON.parse(temp);
   // json[tmp.ID] = {lat: tmp.lat, lng: tmp.lng};
   // console.log(json);
-  console.log("123");
+  console.log("enter position table");
   MongoClient.connect(url, function(err, db) {
     if (err) throw err;
     db.collection("position").findOne({"event_id":tmp.event_id,"name": temp_me}, function(err, result) {
       if (err) throw err;
-      console.log("I'm here");
+      console.log("position check");
       if(!result){
         db.collection("position").insertOne(myobj_p, function(err, res) {
           if (err) throw err;
@@ -139,7 +139,7 @@ app.post("/sendposition",function(req,res,next){
   // var obj = JSON.stringify(json);
   // fs.writeFileSync("./data.json",obj);
   // console.log(json);
-  res.end('123');
+  res.end('end');
 })
 
 app.post("/getdata",function(req,res,next){
