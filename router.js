@@ -33,7 +33,7 @@ exports.sendevent = function(req,res,next){
     "event_id":tmp.id,      
     "name"    : temp_me,
     "displayname":temp_disname,      
-    "position":{lat:0,lng:0}
+    "position":[]
   }
   MongoClient.connect(url, function (err, db) {
     if (err) throw err;
@@ -74,15 +74,25 @@ exports.sendposition = function(req,res,next){
   }
 
   var myquery = {"event_id":tmp.id,"name": temp_me};
-  var newvalues = {$set:{"position":tmp.position}};
 
   MongoClient.connect(url, function(err, db) {
     if (err) throw err;
-    db.collection("position").updateOne(myquery, newvalues, function(err, res) {
+    db.collection("position").findOne(myquery,function(err,res){
       if (err) throw err;
-      console.log("1 document updated");
-      db.close();
-    });
+
+      var tmp_p = res.position;
+      tmp.position.lat = Number(tmp.position.lat);
+      tmp.position.lng = Number(tmp.position.lng);
+      tmp_p.push(tmp.position);
+
+      var newvalues = {$set:{"position":tmp_p}};
+
+      db.collection("position").updateOne(myquery, newvalues, function(err, res) {
+        if (err) throw err;
+        console.log("1 document updated");
+        db.close();
+      });
+    })
   });
   res.end();
 }

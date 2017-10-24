@@ -55,6 +55,7 @@
       var myMarkers = [];
       var temp;
       var events = [];
+      var myCurpos = [];
 
       // Client ID and API key from the Developer Console
       var CLIENT_ID = '506634394743-lfkonje6ojpeqjpfin97v5umupjon3ed.apps.googleusercontent.com';
@@ -205,7 +206,8 @@
           curpos = {
             lat: position.coords.latitude,
             lng: position.coords.longitude
-          };          
+          };
+          myCurpos.push(curpos);    
           var obj = {
             "position" : {
               lat:curpos.lat,
@@ -264,18 +266,22 @@
         setInterval(addMyMarker,10000);
       }
       function addMyMarker(){
-        var image = 'https://maps.google.com/mapfiles/ms/icons/blue-dot.png'        
+        var image = 'https://maps.google.com/mapfiles/ms/icons/blue-dot.png'       
         for (var i = 0; i < myMarkers.length; i++) {
-          myMarkers[i].setMap(null);
+          // myMarkers[i].setMap(null);
+          myMarkers[i].setOpacity(null);
         }
-        myMarkers = [];
+        // myMarkers = [];
         var myMarker = new google.maps.Marker({
           position: curpos,
           map: map,
           icon:image,
           label:"我"
         })
-        myMarkers.push(myMarker);  
+        myMarkers.push(myMarker);
+        for(let i = 0;i < myMarkers.length;i++){
+          myMarkers[i].setOpacity((i + 1) / myMarkers.length)
+        }
       }
       function addMarkers(){
         $.ajax({
@@ -285,17 +291,23 @@
                 "attendees":temp.attendees},
           success: function(result){
             for(var i = 0; i < markers.length; i++) {
-              markers[i].setMap(null);
+              for(let j = 0;j < markers[i].length;j++){
+                markers[i].setMap(null);
+              }
             }
             markers = [];
             for(let i = 0;i < result.length;i++){
-              var marker = new google.maps.Marker({
-                position: {lat: Number(result[i].position.lat),lng: Number(result[i].position.lng)},
-                label: result[i].displayname,
-                map: map
-              })
-              markers.push(marker);
-            }   
+              markers[i] = [];
+              for(let j = 0;j < result[i].position.length;j++){
+                var marker = new google.maps.Marker({
+                  position: {lat: result[i].position[j].lat,lng: result[i].position[j].lng},
+                  label: result[i].displayname,
+                  map: map,
+                  opacity: (j + 1) / result[i].position.length
+                })
+                markers.push(marker);
+              }
+            }
             console.log("add marker success");
           }
         })
