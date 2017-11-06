@@ -5,6 +5,7 @@ var request = require("request");
 var fs = require("fs");
 var mongo = require("mongodb");
 var PORT = process.env.PORT || 8080;
+const path = require("path")
 
 // var privateKey = fs.readFileSync('./private.pem', 'utf8');
 // var certificate = fs.readFileSync('./file.crt', 'utf8');
@@ -20,7 +21,7 @@ var name;
 
 app.set("view engine","ejs");
 // app.set("views","./project_geolocation/views");
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname,"public")));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json())
 
