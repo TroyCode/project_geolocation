@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Google Calendar API Quickstart</title>
+    <title>Login</title>
     <meta charset='utf-8' />
     <script src="https://apis.google.com/js/platform.js" async defer></script>
     <meta name="google-signin-client_id" content="506634394743-lfkonje6ojpeqjpfin97v5umupjon3ed.apps.googleusercontent.com">
   </head>
   <body>
-    <p>Google Calendar API Quickstart</p>
+    <p>Check Event And Location</p>
     <div id="authorize-button" style="display: none"></div>
     <script>
       // function onSuccess(googleUser) {
@@ -106,8 +106,8 @@
     </script>
 
     <script async defer src="https://apis.google.com/js/api.js"
-      onload="this.onload=function(){};handleClientLoad()"
-      onreadystatechange="if (this.readyState === 'complete') this.onload()">
+      onload="this.onload=function(){};handleClientLoad();console.log(this.readyState)"
+      onreadystatechange="if (this.readyState === 'complete') {this.onload();console.log(456)}">
     </script>
 <script src="https://apis.google.com/js/platform.js?onload=renderButton" async defer></script>
   </body>
