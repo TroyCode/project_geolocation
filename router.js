@@ -13,42 +13,42 @@ exports.getCalendar = function(req,res,next){
 
 exports.sendevent = function(req,res,next){
   var tmp = req.body;
-  var myEmail = tmp.attendees[findMe(tmp.attendees)].email;
-  var myName = tmp.attendees[findMe(tmp.attendees)].displayName;
+  // var myEmail = tmp.attendees[findMe(tmp.attendees)].email;
+  // var myName = tmp.attendees[findMe(tmp.attendees)].displayName;
 
   var evt = {
     "evtID": tmp.id,
-    "attendees": tmp.attendees,
+    "attendees": tmp.self,
     "destination": tmp.location
   }
   var pos = {
     "evtID": tmp.id,      
-    "email": myEmail,
-    "name": myName,      
+    "email": tmp.self.myEmail,
+    "name": tmp.self.myName,      
     "position":[]
   }
 
   insert(url,"event",{"evtID": tmp.id},evt);
-  insert(url,"position",{"evtID": tmp.id,"email": myEmail},pos);
+  insert(url,"position",{"evtID": tmp.id,"email": tmp.self.myEmail},pos);
   res.end();
 }
 
 exports.sendposition = function(req,res,next){
   var tmp = req.body;
-  var myEmail = tmp.attendees[findMe(tmp.attendees)].email;
-  var myName = tmp.attendees[findMe(tmp.attendees)].displayName;
+  // var myEmail = tmp.attendees[findMe(tmp.attendees)].email;
+  // var myName = tmp.attendees[findMe(tmp.attendees)].displayName;
   
-  updatePos(url,{"evtID":tmp.id,"email": myEmail},tmp.position)
+  updatePos(url,{"evtID":tmp.id,"email": tmp.email},tmp.position)
   res.end();
 }
 
 exports.getdata = function(req,res,next){
   var tmp = req.body;
-  var myEmail = tmp.attendees[findMe(tmp.attendees)].email;
+  // var myEmail = tmp.attendees[findMe(tmp.attendees)].email;
 
   MongoClient.connect(url, function(err, db) {
     if (err) throw err;
-    db.collection("position").find({"evtID":tmp.event_id,"email":{ $ne:myEmail }}).toArray(function(err, result) {
+    db.collection("position").find({"evtID":tmp.event_id,"email":{ $ne:tmp.email }}).toArray(function(err, result) {
       if (err) throw err;
       db.close();
       res.send(result);
