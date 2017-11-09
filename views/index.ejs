@@ -63,6 +63,7 @@
           scope: SCOPES,
           ux_mode:"redirect",
           redirect_uri:"https://demo3.104di.clifflu.net/calendar"
+          // redirect_uri:"http://localhost:8080/calendar"
         }).then(function () {
           // Listen for sign-in state changes.
           gapi.auth2.getAuthInstance().isSignedIn.listen(updateSigninStatus);

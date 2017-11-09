@@ -76,16 +76,10 @@
           document.getElementById("loading").style.display = "none"
           document.getElementById("loading2").style.display = "block"
           evt = res.result.items[0]
-          var i = 0       
-          if(evt){
-            while(checkTime() < 0){
-              i++
-              if(i < res.result.items.length) evt = res.result.items[i]
-              else{
-                evt = undefined
-                break
-              }
-            }
+          if(evt && checkTime() < 0){
+            evt = res.result.items[1]
+          }
+          if(evt && checkTime() > 0){
             var temp_attendees = "";
             if(evt.hasOwnProperty("attendees")){
               for(let i = 0;i < evt.attendees.length;i++){
@@ -133,23 +127,24 @@
       function updatecurpos(){
         if (evt) {
           navigator.geolocation.getCurrentPosition(function (position) {
-          curpos = {
-            lat: position.coords.latitude,
-            lng: position.coords.longitude
-          };
-          myCurpos.push(curpos);    
-          var obj = {
-            "position" : {
-              lat:curpos.lat,
-              lng:curpos.lng
-            },
-            "id":temp.id,
-            "email":temp.self.myEmail
-          }
-          console.log(curpos);
-            $.post("/sendposition",obj,function(data, status){
-              console.log("update current success");
-            })
+            curpos = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude
+            };
+            myCurpos.push(curpos);
+            console.log(myCurpos)
+            if(myCurpos.length === 5){
+              var obj = {
+                "position" : Avg(myCurpos),
+                "id": temp.id,
+                "email": temp.self.myEmail
+              }
+              myCurpos.shift()
+              myCurpos.shift()
+              $.post("/sendposition",obj,function(data, status){
+                console.log("update current success");
+              })
+            }
           })
         }
       }
@@ -297,6 +292,15 @@
         const tmp = document.getElementById("map").firstChild
         if(tmp.style.display === "block") tmp.style.display = "none"
         else tmp.style.display = "block"
+      }
+      function Avg(pos){
+        var avglat = 0
+        var avglng = 0
+        for(let i=0;i<pos.length;i++){
+            avglat+= pos[i].lat / pos.length
+            avglng+= pos[i].lng / pos.length
+        }
+        return {lat:avglat,lng:avglng}
       }
     </script>
 
