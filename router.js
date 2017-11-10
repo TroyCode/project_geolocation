@@ -25,7 +25,8 @@ exports.sendevent = function(req,res,next){
   var pos = {
     "evtID": tmp.id,      
     "email": tmp.self.myEmail,
-    "name": tmp.self.myName,      
+    "name": tmp.self.myName,
+    "photo": tmp.self.myPhoto,      
     "position":[]
   }
 

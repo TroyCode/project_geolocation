@@ -29,8 +29,7 @@
       var CLIENT_ID = '506634394743-lfkonje6ojpeqjpfin97v5umupjon3ed.apps.googleusercontent.com';
       var DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"];
       var SCOPES = "https://www.googleapis.com/auth/calendar.readonly";
-
-      var authorizeButton = document.getElementById('authorize-button');
+      
       var signoutButton = document.getElementById('signout-button');
       
       function handleClientLoad() {
@@ -105,7 +104,8 @@
               location: evt.location,
               self: {
                 myName: gapi.auth2.getAuthInstance().currentUser.Ab.w3.ig,
-                myEmail: gapi.auth2.getAuthInstance().currentUser.Ab.w3.U3
+                myEmail: gapi.auth2.getAuthInstance().currentUser.Ab.w3.U3,
+                myPhoto:gapi.auth2.getAuthInstance().currentUser.Ab.w3.Paa
               }
             }
             console.log(temp)
@@ -135,9 +135,9 @@
             console.log(myCurpos)
             if(myCurpos.length === 5){
               var obj = {
-                "position" : Avg(myCurpos),
+                "position": Avg(myCurpos),
                 "id": temp.id,
-                "email": temp.self.myEmail
+                "email": temp.self.myEmail,
               }
               myCurpos.shift()
               myCurpos.shift()
@@ -161,7 +161,7 @@
               despos.lat=result.position.lat
               despos.lng=result.position.lng
               var script = document.createElement('script');
-              script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyBtLdMhgwM1UN5bRNt7OT1y5rvUQmhpbPM&callback=initMap';
+              script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyBUVMPkDskVQlUsdw92-Ygv9qhIB0UOQH4&callback=initMap';
               var body = document.getElementsByTagName("body")[0];
               body.appendChild(script);
             }
