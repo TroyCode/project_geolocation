@@ -29,8 +29,7 @@
       var CLIENT_ID = '506634394743-lfkonje6ojpeqjpfin97v5umupjon3ed.apps.googleusercontent.com';
       var DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"];
       var SCOPES = "https://www.googleapis.com/auth/calendar.readonly";
-
-      var authorizeButton = document.getElementById('authorize-button');
+      
       var signoutButton = document.getElementById('signout-button');
       
       function handleClientLoad() {
@@ -76,16 +75,10 @@
           document.getElementById("loading").style.display = "none"
           document.getElementById("loading2").style.display = "block"
           evt = res.result.items[0]
-          var i = 0       
-          if(evt){
-            while(checkTime() < 0){
-              i++
-              if(i < res.result.items.length) evt = res.result.items[i]
-              else{
-                evt = undefined
-                break
-              }
-            }
+          if(evt && checkTime() < 0){
+            evt = res.result.items[1]
+          }
+          if(evt && checkTime() > 0){
             var temp_attendees = "";
             if(evt.hasOwnProperty("attendees")){
               for(let i = 0;i < evt.attendees.length;i++){
@@ -111,7 +104,8 @@
               location: evt.location,
               self: {
                 myName: gapi.auth2.getAuthInstance().currentUser.Ab.w3.ig,
-                myEmail: gapi.auth2.getAuthInstance().currentUser.Ab.w3.U3
+                myEmail: gapi.auth2.getAuthInstance().currentUser.Ab.w3.U3,
+                myPhoto:gapi.auth2.getAuthInstance().currentUser.Ab.w3.Paa
               }
             }
             console.log(temp)
@@ -133,23 +127,24 @@
       function updatecurpos(){
         if (evt) {
           navigator.geolocation.getCurrentPosition(function (position) {
-          curpos = {
-            lat: position.coords.latitude,
-            lng: position.coords.longitude
-          };
-          myCurpos.push(curpos);    
-          var obj = {
-            "position" : {
-              lat:curpos.lat,
-              lng:curpos.lng
-            },
-            "id":temp.id,
-            "email":temp.self.myEmail
-          }
-          console.log(curpos);
-            $.post("/sendposition",obj,function(data, status){
-              console.log("update current success");
-            })
+            curpos = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude
+            };
+            myCurpos.push(curpos);
+            console.log(myCurpos)
+            if(myCurpos.length === 5){
+              var obj = {
+                "position": Avg(myCurpos),
+                "id": temp.id,
+                "email": temp.self.myEmail,
+              }
+              myCurpos.shift()
+              myCurpos.shift()
+              $.post("/sendposition",obj,function(data, status){
+                console.log("update current success");
+              })
+            }
           })
         }
       }
@@ -166,7 +161,7 @@
               despos.lat=result.position.lat
               despos.lng=result.position.lng
               var script = document.createElement('script');
-              script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyBtLdMhgwM1UN5bRNt7OT1y5rvUQmhpbPM&callback=initMap';
+              script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyBUVMPkDskVQlUsdw92-Ygv9qhIB0UOQH4&callback=initMap';
               var body = document.getElementsByTagName("body")[0];
               body.appendChild(script);
             }
@@ -297,6 +292,15 @@
         const tmp = document.getElementById("map").firstChild
         if(tmp.style.display === "block") tmp.style.display = "none"
         else tmp.style.display = "block"
+      }
+      function Avg(pos){
+        var avglat = 0
+        var avglng = 0
+        for(let i=0;i<pos.length;i++){
+            avglat+= pos[i].lat / pos.length
+            avglng+= pos[i].lng / pos.length
+        }
+        return {lat:avglat,lng:avglng}
       }
     </script>
 

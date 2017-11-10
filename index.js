@@ -18,7 +18,6 @@ var router = require("./router.js");
 var event_id;
 var name;
 
-
 app.set("view engine","ejs");
 // app.set("views","./project_geolocation/views");
 app.use(express.static(path.join(__dirname,"public")));

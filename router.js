@@ -2,6 +2,7 @@ const request = require("request");
 const MongoClient = require("mongodb").MongoClient;
 
 const url = "mongodb://10.128.21.160:27017/users";
+// const url = "mongodb://localhost:27017/users";
 
 exports.getHomepage = function(req,res,next){
   res.render("index");
@@ -24,7 +25,8 @@ exports.sendevent = function(req,res,next){
   var pos = {
     "evtID": tmp.id,      
     "email": tmp.self.myEmail,
-    "name": tmp.self.myName,      
+    "name": tmp.self.myName,
+    "photo": tmp.self.myPhoto,      
     "position":[]
   }
 
