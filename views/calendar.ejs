@@ -26,7 +26,6 @@
       var temp;
       var evt;
       var myCurpos = [];
-      var markers2 = [];
 
       var CLIENT_ID = '506634394743-lfkonje6ojpeqjpfin97v5umupjon3ed.apps.googleusercontent.com';
       var DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"];
@@ -98,7 +97,7 @@
                 summary: evt.summary,
                 start: getDateTime(evt.start.dateTime),
                 location: evt.location,
-                attendees: gapi.auth2.getAuthInstance().currentUser.Ab.w3.ig,
+                attendees: gapi.auth2.getAuthInstance().currentUser.Ab.w3.ig
               }
             }
             temp = {
@@ -139,7 +138,7 @@
               var obj = {
                 "position": Avg(myCurpos),
                 "id": temp.id,
-                "email": temp.self.myEmail,
+                "email": temp.self.myEmail
               }
               myCurpos.shift()
               myCurpos.shift()
@@ -211,8 +210,6 @@
           icon:image,
           label:"我"
         })
-        new CustomMarker(new google.maps.LatLng(24.979773,121.5494491), map,  mypict)
-        console.log(new google.maps.LatLng(24.979773,121.5494491))
       }
       function getOtherPos(){
         $.ajax({
@@ -315,15 +312,13 @@
           data:{"event_id":temp.id,
                 "email":temp.self.myEmail},
           success: function(result){
-            for(var i = 0; i < markers2.length; i++) {
-              for(let j = 0;j < markers2[i].length;j++){
-                markers2[i].setMap(null);
-              }
+            var arr = document.getElementsByClassName("customMarker")
+            for(let i = 0;i < arr.length;i++){
+              arr[i].outerHTML = ""
             }
             for(let i = 0;i < result.length;i++){
-              markers2[i] = []
               for(let j = 0;j < result[i].position.length;j++){
-                markers2.push(new CustomMarker(new google.maps.LatLng(result[i].position[j].lat,result[i].position[j].lng),map,result[i].photo)) 
+                new CustomMarker(new google.maps.LatLng(result[i].position[j].lat,result[i].position[j].lng),map,result[i].photo)
               }
             }
           }
@@ -352,9 +347,9 @@
               var img = document.createElement("img");
               img.src = this.imageSrc;
               div.appendChild(img);
-              google.maps.event.addDomListener(div, "click", function (event) {
-                  google.maps.event.trigger(me, "click");
-              });
+              // google.maps.event.addDomListener(div, "click", function (event) {
+              //     google.maps.event.trigger(me, "click");
+              // });
 
               // Then add the overlay to the DOM
               var panes = this.getPanes();
