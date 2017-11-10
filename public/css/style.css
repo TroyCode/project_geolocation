@@ -43,3 +43,33 @@ p{
   margin-left:10px
 
 }
+
+.customMarker {
+    position:absolute;
+    cursor:pointer;
+    width:33px;
+    height:33px;
+    /* -width/2 */
+    margin-left:-17px;
+    /* -height + arrow */
+    margin-top:-43px;
+    border-radius:50%;
+    padding:0px;
+}
+.customMarker:after {
+    content:"";
+    position: absolute;
+    bottom: -5px;
+    left: 11px;
+    border-width: 6px 6px 0;
+    border-style: solid;
+    border-color: #424242 transparent;
+    display: block;
+    width: 0;
+}
+.customMarker img {
+    width:30px;
+    height:30px;
+    margin:1.5px;
+    border-radius:50%;
+}
