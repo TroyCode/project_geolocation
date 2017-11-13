@@ -211,38 +211,6 @@
           label:"我"
         })
       }
-      function getOtherPos(){
-        $.ajax({
-          url: "/getdata",
-          type: "post",
-          data:{"event_id":temp.id,
-                "email":temp.self.myEmail},
-          success: function(result){
-            addMarkers(result)
-          }
-        })
-      }
-      function addMarkers(allPos){
-        for(var i = 0; i < markers.length; i++) {
-          for(let j = 0;j < markers[i].length;j++){
-            markers[i].setMap(null);
-          }
-        }
-        markers = [];
-        for(let i = 0;i < allPos.length;i++){
-          markers[i] = [];
-          for(let j = 0;j < allPos[i].position.length;j++){
-            var marker = new google.maps.Marker({
-              position: {lat: allPos[i].position[j].lat,lng: allPos[i].position[j].lng},
-              label: allPos[i].name,
-              map: map,
-              opacity: (j + 1) / allPos[i].position.length
-            })
-            markers.push(marker);
-          }
-        }
-        console.log("add marker success");
-      }
       function getDateTime(time) {
         var date = new Date(time);
         var hour = date.getHours();
@@ -312,10 +280,7 @@
           data:{"event_id":temp.id,
                 "email":temp.self.myEmail},
           success: function(result){
-            var arr = document.getElementsByClassName("customMarker")
-            for(let i = 0;i < arr.length;i++){
-              arr[i].outerHTML = ""
-            }
+            removeMarkers("customMarker")
             for(let i = 0;i < result.length;i++){
               for(let j = 0;j < result[i].position.length;j++){
                 new CustomMarker(new google.maps.LatLng(result[i].position[j].lat,result[i].position[j].lng),map,result[i].photo)
@@ -363,6 +328,15 @@
               div.style.top = point.y + 'px';
           }
       };
+      function removeMarkers(str){
+        const tmp = document.getElementsByClassName(str)
+        // while(tmp.length){
+        //   tmp[0].remove()
+        // }
+        for(let i = tmp.length - 1;i >= 0;i--){
+          tmp[i].remove()
+        }
+      }
     </script>
 
     <script async defer src="https://apis.google.com/js/api.js"
