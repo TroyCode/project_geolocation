@@ -295,22 +295,24 @@ function addMarker(arr,map){
     var displayCount = 5
     var show = (arr[i].position.length <= displayCount) ? arr[i].position.length : displayCount
     
-    for(let j = arr[i].position.length-1 ;j > arr[i].position.length-1-show; j--){
-      new CustomMarker(new google.maps.LatLng(arr[i].position[j].lat,arr[i].position[j].lng),map,arr[i].photo)
+    for(let j = arr[i].position.length - 1 ;j > arr[i].position.length - 1 - show; j--){
+      new CustomMarker(new google.maps.LatLng(arr[i].position[j].lat,arr[i].position[j].lng),map,arr[i].photo,(show - arr[i].position.length + j + 1) / show)
     }
   }
 }
 
 function addTrack(arr){
-  var res = [] 
-  for(let i = 1;i < arr.length;i++){
+  var res = []
+  var displayCount = 5
+  var show = (arr.length <= displayCount) ? arr.length : displayCount
+  for(let i = arr.length - 1;i > arr.length - show;i--){
     var tmp = [arr[i - 1],arr[i]]
     var flightPath = new google.maps.Polyline({
       map: map,
       path: tmp,
       geodesic: true,
-      strokeColor: '#FF0000',
-      strokeOpacity: i / (arr.length - 1),
+      strokeColor: '#ff0000',
+      strokeOpacity: 1 - (arr.length - i - 1) / (show - 1),
       strokeWeight: 2
     });
     res.push(flightPath)
