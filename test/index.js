@@ -1,13 +1,11 @@
 const request = require("supertest")
 const assert = require("chai").assert
 const server = require("../index.js")
-const calendar = require("../public/js/test_function.js")
+const tsFn = require("../public/js/test_function.js")
 const router = require("../router.js")
 
 const mockReq = {location:"台北市新店區寶中路119號"}
 const errMsg = "Calendar Destination is illegal"
-const mockAttendee = [{name: "Taco",age: 20,self: true},{name: "Benson",age: 25},{name: "Peter",age: 30}]
-const mockAttendee2 = [{name: "Taco",age: 20},{name: "Benson",age: 25},{name: "Peter",age: 30}]
 
 describe("POST /getDestination", () => {
   it("should return latlng from google api", (done) => {
@@ -39,10 +37,18 @@ describe("POST /getDestination", () => {
 
 describe('check getDateTime() function', () => {
   it('should convet correct datetime format', () => {
-    assert(calendar.getDateTime(1510642469102) === "2017-11-14 14:54:29")
-    assert(calendar.getDateTime("2017/11/14 14:41:16") === "2017-11-14 14:41:16")
-    assert(calendar.getDateTime("2017-11-14 14:41:16") === "2017-11-14 14:41:16")
-    assert.isFalse(calendar.getDateTime("2017:11:14 14:41:16") === "2017-11-14 14:41:16")    
-    assert.isFalse(calendar.getDateTime("2017-11-14 14-41-16") === "2017-11-14 14:41:16")
+    assert(tsFn.getDateTime("2017/11/14 14:41:16") === "2017-11-14 14:41:16")
+    assert(tsFn.getDateTime("2017-11-14 14:41:16") === "2017-11-14 14:41:16")
+    assert.isFalse(tsFn.getDateTime("2017:11:14 14:41:16") === "2017-11-14 14:41:16")    
+    assert.isFalse(tsFn.getDateTime("2017-11-14 14-41-16") === "2017-11-14 14:41:16")
+  })
+})
+
+describe('check checkTime() function', () => {
+  it('should return expiration or not', () => {
+    assert(tsFn.checkTime("2018/11/14 14:41:16") > 0)
+    assert(tsFn.checkTime("2200/06/14 14:41:16") > 0)
+    assert(tsFn.checkTime(new Date()) === 0)    
+    assert(tsFn.checkTime("2016/06/14 14:41:16") < 0)
   })
 })
