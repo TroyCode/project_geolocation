@@ -20,8 +20,6 @@ exports.getCalendar = function(req,res,next){
 
 exports.sendevent = function(req,res,next){
   var tmp = req.body;
-  // var myEmail = tmp.attendees[findMe(tmp.attendees)].email;
-  // var myName = tmp.attendees[findMe(tmp.attendees)].displayName;
 
   var evt = {
     "evtID": tmp.id,
@@ -43,8 +41,6 @@ exports.sendevent = function(req,res,next){
 
 exports.sendposition = function(req,res,next){
   var tmp = req.body;
-  // var myEmail = tmp.attendees[findMe(tmp.attendees)].email;
-  // var myName = tmp.attendees[findMe(tmp.attendees)].displayName;
   
   updatePos(url,{"evtID":tmp.id,"email": tmp.email},tmp.position)
   res.end();
@@ -52,7 +48,6 @@ exports.sendposition = function(req,res,next){
 
 exports.getdata = function(req,res,next){
   var tmp = req.body;
-  // var myEmail = tmp.attendees[findMe(tmp.attendees)].email;
 
   MongoClient.connect(url, function(err, db) {
     if (err) throw err;
@@ -122,12 +117,3 @@ function updatePos(url,filter,data){
   })
 }
 
-function findMe(arr){
-  for(let i = 0;i < arr.length;i++){
-    if(arr[i].self){
-      return i
-    }
-  }
-  return false
-}
-exports.findMe = findMe

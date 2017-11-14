@@ -1,6 +1,7 @@
 const request = require("supertest")
 const assert = require("chai").assert
 const server = require("../index.js")
+const calendar = require("../public/js/test_function.js")
 const router = require("../router.js")
 
 const mockReq = {location:"台北市新店區寶中路119號"}
@@ -36,10 +37,12 @@ describe("POST /getDestination", () => {
   })
 })
 
-describe("check findMe function", () => {
-  it("should find correct person info", (done) => {
-    assert.equal(router.findMe(mockAttendee),0)
-    assert.isFalse(router.findMe(mockAttendee2))
-    done()
+describe('check getDateTime() function', () => {
+  it('should convet correct datetime format', () => {
+    assert(calendar.getDateTime(1510642469102) === "2017-11-14 14:54:29")
+    assert(calendar.getDateTime("2017/11/14 14:41:16") === "2017-11-14 14:41:16")
+    assert(calendar.getDateTime("2017-11-14 14:41:16") === "2017-11-14 14:41:16")
+    assert.isFalse(calendar.getDateTime("2017:11:14 14:41:16") === "2017-11-14 14:41:16")    
+    assert.isFalse(calendar.getDateTime("2017-11-14 14-41-16") === "2017-11-14 14:41:16")
   })
 })
