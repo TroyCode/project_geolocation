@@ -56,10 +56,10 @@ function listUpcomingEvents() {
     document.getElementById("loading").style.display = "none"
     document.getElementById("loading2").style.display = "block"
     evt = res.result.items[0]
-    if(evt && checkTime() < 0){
+    if(evt && checkTime(evt.start.dateTime) < 0){
       evt = res.result.items[1]
     }
-    if(evt && checkTime() > 0){
+    if(evt && checkTime(evt.start.dateTime) > 0){
       var temp_attendees = "";
       if(evt.hasOwnProperty("attendees")){
         for(let i = 0;i < evt.attendees.length;i++){
@@ -131,7 +131,7 @@ setInterval(updatecurpos,5000)
 var check = setInterval(showMap,5000)
 var despos={lat:0,lng:0}
 function showMap(){
-  if (evt && checkTime() <= 1800000) {
+  if (evt && checkTime(evt.start.dateTime) <= 1800000) {
     $.ajax({
       url: "/getDestination",
       type: "post",
@@ -198,8 +198,8 @@ function getDateTime(time) {
   return year + "-" + month + "-" + day + " " + hour + ":" + min + ":" + sec;
 }
 
-function checkTime(){
-  var des = new Date(evt.start.dateTime).getTime()
+function checkTime(st){
+  var des = new Date(st).getTime()
   var now = Date.now()
   var diff = des - now
   return diff
