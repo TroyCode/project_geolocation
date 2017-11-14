@@ -292,8 +292,11 @@ CustomMarker.prototype.draw = function(){
 
 function addMarker(arr,map){
   for(let i = 0;i < arr.length;i++){
-    for(let j = 0;j < arr[i].position.length;j++){
-      new CustomMarker(new google.maps.LatLng(arr[i].position[j].lat,arr[i].position[j].lng),map,arr[i].photo,(j + 1) / arr[i].position.length)
+    var displayCount = 5
+    var show = (arr[i].position.length <= displayCount) ? arr[i].position.length : displayCount
+    
+    for(let j = arr[i].position.length-1 ;j > arr[i].position.length-1-show; j--){
+      new CustomMarker(new google.maps.LatLng(arr[i].position[j].lat,arr[i].position[j].lng),map,arr[i].photo)
     }
   }
 }
