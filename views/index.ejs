@@ -4,7 +4,7 @@
     <title>Login</title>
     <meta charset='utf-8' />
     <script src="https://apis.google.com/js/platform.js" async defer></script>
-    <meta name="google-signin-client_id" content="506634394743-lfkonje6ojpeqjpfin97v5umupjon3ed.apps.googleusercontent.com">
+    <!-- <meta name="google-signin-client_id" content="506634394743-lfkonje6ojpeqjpfin97v5umupjon3ed.apps.googleusercontent.com"> -->
   </head>
   <body>
     <p>Check Event And Location</p>
@@ -106,10 +106,7 @@
       }
     </script>
 
-    <script async defer src="https://apis.google.com/js/api.js"
-      onload="this.onload=function(){};handleClientLoad();console.log(this.readyState)"
-      onreadystatechange="if (this.readyState === 'complete') {this.onload();console.log(456)}">
-    </script>
-<script src="https://apis.google.com/js/platform.js?onload=renderButton" async defer></script>
+    <script async defer src="https://apis.google.com/js/api.js/?onload=handleClientLoad"></script>
+    <script async defer src="https://apis.google.com/js/platform.js?onload=renderButton"></script>
   </body>
 </html>

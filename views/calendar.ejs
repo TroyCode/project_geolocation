@@ -109,7 +109,6 @@
                 myPhoto:gapi.auth2.getAuthInstance().currentUser.Ab.w3.Paa
               }
             }
-            console.log(temp)
             appendOne("myEvent",info)
             $.ajax({
               url: "/sendevent",
@@ -340,9 +339,7 @@
     </script>
 
     <script async defer src="https://apis.google.com/js/api.js"
-      onload="this.onload=function(){};handleClientLoad()"
-      onreadystatechange="if (this.readyState === 'complete') this.onload()">
+      onload="handleClientLoad()">
     </script>
-    <script src="https://apis.google.com/js/platform.js?onload=renderButton" async defer></script>
   </body>
 </html>
