@@ -1,6 +1,5 @@
 const request = require("request");
 const MongoClient = require("mongodb").MongoClient;
-const ip = require("ip")
 
 const url = "mongodb://10.128.21.160:27017/users";
 // const url = "mongodb://localhost:27017/users";
@@ -9,11 +8,6 @@ const url = "mongodb://10.128.21.160:27017/users";
 exports.getHomepage = function(req,res,next){
   res.render("index");
 }
-
-exports.getIp = function(req,res,next){
-  res.send({ip: ip.address()});
-}
-
 exports.getCalendar = function(req,res,next){
   res.render("calendar");
 }
@@ -23,7 +17,6 @@ exports.sendevent = function(req,res,next){
 
   var evt = {
     "evtID": tmp.id,
-    "attendees": tmp.self,
     "destination": tmp.location
   }
   var pos = {
@@ -116,4 +109,3 @@ function updatePos(url,filter,data){
     });
   })
 }
-

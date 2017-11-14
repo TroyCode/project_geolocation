@@ -34,7 +34,6 @@ html,body {
 #map:last-child{
   margin-top: 17%;
   text-align: center;
-  /* display: none */
   z-index: 9999
 }
 
