@@ -3,17 +3,15 @@
   <head>
     <title>Find friend's location</title>
     <meta charset='utf-8' />
-    <link rel="stylesheet" type="text/css" href="./css/style.css">    
+    <link rel="stylesheet" type="text/css" href="./css/style.css">  
     <script src="https://apis.google.com/js/platform.js" async defer></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBUVMPkDskVQlUsdw92-Ygv9qhIB0UOQH4"></script>
-    <meta name="google-signin-client_id" content="506634394743-lfkonje6ojpeqjpfin97v5umupjon3ed.apps.googleusercontent.com">
   </head>
   <body>
     <button id="signout-button" style="display: block;">Sign Out</button>
     <image id="loading" src="./image/icon.gif"></image>
     <p id="myEvent"></p>
-    <!-- <div id="countDown"></div> -->
     <button id="showMap" onclick="showAndHide()" style="display:none">Show and Hide</button>
     <image id="loading2" src="./image/icon.gif" style="display:none"></image>
     <div id="map"></div>
@@ -132,15 +130,14 @@
               lng: position.coords.longitude
             };
             myCurpos.push(curpos);
-            console.log(myCurpos)
+            // console.log(myCurpos)
             if(myCurpos.length === 5){
               var obj = {
                 "position": Avg(myCurpos),
                 "id": temp.id,
                 "email": temp.self.myEmail
               }
-              myCurpos.shift()
-              myCurpos.shift()
+              myCurpos.splice(0,2)  // shift twice
               $.post("/sendposition",obj,function(data, status){
                 console.log("update current success");
               })
@@ -160,11 +157,7 @@
             success: function(result){
               despos.lat=result.position.lat
               despos.lng=result.position.lng
-              // var script = document.createElement('script');
-              // script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyBtLdMhgwM1UN5bRNt7OT1y5rvUQmhpbPM&callback=initMap';
               initMap();
-              // var body = document.getElementsByTagName("body")[0];
-              // body.appendChild(script);
             }
           })
           clearInterval(check)
@@ -193,20 +186,17 @@
         map.setCenter(despos);
         document.getElementById('map').firstChild.style.display = "block"
         countDown()
-        getOtherPos2();
+        getOtherPos();
         addMyMarker();
-        setInterval(getOtherPos2,10000);
+        setInterval(getOtherPos,10000);
         setInterval(addMyMarker,10000);
       }
         
       function addMyMarker(){
-        var image = 'https://maps.google.com/mapfiles/ms/icons/blue-dot.png'  
-        var mypict = "https://lh3.googleusercontent.com/-FVqfa8q6Zlg/AAAAAAAAAAI/AAAAAAAAAAA/ANQ0kf6J8XvXD0PXEcoptFYzuN5vQPEpiA/s64-c-mo/photo.jpg"     
         if(myMarker) myMarker.setMap(null)
         myMarker = new google.maps.Marker({
           position: curpos,
           map: map,
-          icon:image,
           label:"我"
         })
       }
@@ -250,7 +240,6 @@
           tmp.setAttribute("id","countDown")
           tmp.setAttribute("style","margin-top: 1%;text-align: center;position: relative;font-size:180px;opacity:0.5;color:red")
           tmp.innerText = ((hours < 10) ? "0" : "") + hours + ":" + ((mins < 10) ? "0" : "") + mins + ":" + ((secs < 10) ? "0" : "") + secs
-          // document.getElementById("countDown").innerText = ((hours < 10) ? "0" : "") + hours + ":" + ((mins < 10) ? "0" : "") + mins + ":" + ((secs < 10) ? "0" : "") + secs
           document.getElementById("map").appendChild(tmp)
           if(diff < 0){
             clearInterval(countDown)
@@ -267,12 +256,12 @@
         var avglat = 0
         var avglng = 0
         for(let i=0;i<pos.length;i++){
-            avglat+= pos[i].lat / pos.length
-            avglng+= pos[i].lng / pos.length
+            avglat += pos[i].lat / pos.length
+            avglng += pos[i].lng / pos.length
         }
         return {lat:avglat,lng:avglng}
       }
-      function getOtherPos2(){
+      function getOtherPos(){
         $.ajax({
           url: "/getdata",
           type: "post",
@@ -280,66 +269,56 @@
                 "email":temp.self.myEmail},
           success: function(result){
             removeMarkers("customMarker")
-            for(let i = 0;i < result.length;i++){
-              for(let j = 0;j < result[i].position.length;j++){
-                new CustomMarker(new google.maps.LatLng(result[i].position[j].lat,result[i].position[j].lng),map,result[i].photo)
-              }
-            }
+            addMarker(result,map)
           }
         })
       }
       function CustomMarker(latlng, map, imageSrc) {
-          this.latlng_ = latlng;
-          this.imageSrc = imageSrc;
-          // Once the LatLng and text are set, add the overlay to the map.  This will
-          // trigger a call to panes_changed which should in turn call draw.
-          this.setMap(map);
+        this.latlng_ = latlng;
+        this.imageSrc = imageSrc;
+        this.setMap(map);
       }
 
       CustomMarker.prototype = new google.maps.OverlayView();
 
-      CustomMarker.prototype.draw = function () {
-          // Check if the div has been created.
-          var div = this.div_;
-          if (!div) {
-              // Create a overlay text DIV
-              div = this.div_ = document.createElement('div');
-              // Create the DIV representing our CustomMarker
-              div.className = "customMarker"
+      CustomMarker.prototype.draw = function(){
+        var div = this.div_;
+        if(!div){
+          div = this.div_ = document.createElement('div');
+          div.className = "customMarker"
 
+          var img = document.createElement("img");
+          img.src = this.imageSrc;
+          div.appendChild(img);
 
-              var img = document.createElement("img");
-              img.src = this.imageSrc;
-              div.appendChild(img);
-              // google.maps.event.addDomListener(div, "click", function (event) {
-              //     google.maps.event.trigger(me, "click");
-              // });
-
-              // Then add the overlay to the DOM
-              var panes = this.getPanes();
-              panes.overlayImage.appendChild(div);
-          }
-
-          // Position the overlay 
-          var point = this.getProjection().fromLatLngToDivPixel(this.latlng_);
-          if (point) {
-              div.style.left = point.x + 'px';
-              div.style.top = point.y + 'px';
-          }
+          var panes = this.getPanes();
+          panes.overlayImage.appendChild(div);
+        }
+        var point = this.getProjection().fromLatLngToDivPixel(this.latlng_);
+        if (point) {
+          div.style.left = point.x + 'px';
+          div.style.top = point.y + 'px';
+        }
       };
+
+      function addMarker(arr,map){
+        for(let i = 0;i < arr.length;i++){
+          for(let j = 0;j < arr[i].position.length;j++){
+            new CustomMarker(new google.maps.LatLng(arr[i].position[j].lat,arr[i].position[j].lng),map,arr[i].photo)
+          }
+        }
+      }
+
       function removeMarkers(str){
         const tmp = document.getElementsByClassName(str)
-        // while(tmp.length){
-        //   tmp[0].remove()
-        // }
-        for(let i = tmp.length - 1;i >= 0;i--){
-          tmp[i].remove()
+        if(tmp.length){
+          for(let i = tmp.length - 1;i >= 0;i--){
+            tmp[i].remove()
+          }
         }
       }
     </script>
-
-    <script async defer src="https://apis.google.com/js/api.js"
-      onload="handleClientLoad()">
+    <script async defer src="https://apis.google.com/js/api.js?onload=handleClientLoad">
     </script>
   </body>
 </html>
