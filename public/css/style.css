@@ -34,7 +34,6 @@ html,body {
 #map:last-child{
   margin-top: 17%;
   text-align: center;
-  /* display: none */
   z-index: 9999
 }
 
@@ -49,9 +48,7 @@ p{
     cursor:pointer;
     width:33px;
     height:33px;
-    /* -width/2 */
     margin-left:-17px;
-    /* -height + arrow */
     margin-top:-43px;
     border-radius:50%;
     padding:0px;
