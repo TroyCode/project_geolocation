@@ -5,6 +5,7 @@ var myMarker;
 var temp;
 var evt;
 var myCurpos = [];
+var path = []
 
 var CLIENT_ID = '506634394743-lfkonje6ojpeqjpfin97v5umupjon3ed.apps.googleusercontent.com';
 var DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"];
@@ -251,12 +252,18 @@ function getOtherPos(){
     success: function(result){
       removeMarkers("customMarker")
       addMarker(result,map)
+      removeTrack(path)
+      path = []
+      for(let i = 0;i < result.length;i++){
+        path.push(addTrack(result[i].position))
+      }
     }
   })
 }
-function CustomMarker(latlng, map, imageSrc) {
+function CustomMarker(latlng, map, imageSrc, opacity) {
   this.latlng_ = latlng;
   this.imageSrc = imageSrc;
+  this.opacity = opacity
   this.setMap(map);
 }
 
@@ -280,14 +287,32 @@ CustomMarker.prototype.draw = function(){
     div.style.left = point.x + 'px';
     div.style.top = point.y + 'px';
   }
+  div.style.opacity = this.opacity
 };
 
 function addMarker(arr,map){
   for(let i = 0;i < arr.length;i++){
     for(let j = 0;j < arr[i].position.length;j++){
-      new CustomMarker(new google.maps.LatLng(arr[i].position[j].lat,arr[i].position[j].lng),map,arr[i].photo)
+      new CustomMarker(new google.maps.LatLng(arr[i].position[j].lat,arr[i].position[j].lng),map,arr[i].photo,(j + 1) / arr[i].position.length)
     }
   }
+}
+
+function addTrack(arr){
+  var res = [] 
+  for(let i = 1;i < arr.length;i++){
+    var tmp = [arr[i - 1],arr[i]]
+    var flightPath = new google.maps.Polyline({
+      map: map,
+      path: tmp,
+      geodesic: true,
+      strokeColor: '#FF0000',
+      strokeOpacity: i / (arr.length - 1),
+      strokeWeight: 2
+    });
+    res.push(flightPath)
+  }
+  return res;
 }
 
 function removeMarkers(str){
@@ -295,6 +320,16 @@ function removeMarkers(str){
   if(tmp.length){
     for(let i = tmp.length - 1;i >= 0;i--){
       tmp[i].remove()
+    }
+  }
+}
+
+function removeTrack(arr){
+  if(arr.length){
+    for(let i = 0;i < arr.length;i++){
+      for(let j = 0;j < arr[i].length;j++){
+        arr[i][j].setMap(null);
+      }
     }
   }
 }
