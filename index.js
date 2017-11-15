@@ -27,8 +27,6 @@ app.use(bodyParser.json())
 
 app.get("/",router.getHomepage);
 
-app.get("/ip",router.getIp)
-
 app.get("/calendar",router.getCalendar);
 
 app.post("/sendevent",router.sendevent);
